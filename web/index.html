@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Legal PRAG Chatbot</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="chat-panel">
+        <header class="topbar">
+          <div>
+            <h1>Vietnamese Legal PRAG</h1>
+            <p id="status">Đang kiểm tra trạng thái...</p>
+          </div>
+          <span class="badge">BM25 + LoRA</span>
+        </header>
+
+        <div id="messages" class="messages">
+          <article class="message bot">
+            <div class="bubble">
+              Nhập câu hỏi pháp luật Việt Nam. Câu trả lời chỉ dùng cho mục đích học tập.
+            </div>
+          </article>
+        </div>
+
+        <form id="chat-form" class="composer">
+          <textarea
+            id="question"
+            rows="2"
+            placeholder="Ví dụ: Người lao động nghỉ hằng năm bao nhiêu ngày?"
+            autocomplete="off"
+          ></textarea>
+          <button id="send" type="submit">Gửi</button>
+        </form>
+      </section>
+    </main>
+    <script src="/static/app.js"></script>
+  </body>
+</html>
+
