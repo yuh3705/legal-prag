@@ -18,12 +18,30 @@ function addMessage(role, text) {
   return bubble;
 }
 
+async function parseJsonResponse(response) {
+  const text = await response.text();
+  try {
+    return text ? JSON.parse(text) : {};
+  } catch {
+    throw new Error(text || `HTTP ${response.status}`);
+  }
+}
+
 async function loadStatus() {
   try {
     const response = await fetch("/api/status");
-    const data = await response.json();
-    const mode = data.mode === "prag_lora" ? "PRAG LoRA" : data.mode;
-    statusEl.textContent = `${mode} · top_k=${data.top_k}`;
+    const data = await parseJsonResponse(response);
+    const modeLabels = {
+      rag: "RAG with source prompt",
+      prag: "PRAG adapter-only",
+      hybrid: "PRAG + source prompt",
+      extractive: "Extractive",
+    };
+    const generation = modeLabels[data.mode] || data.mode;
+    const retrieval = data.dense_retrieval ? "BM25+dense" : "BM25";
+    const denseState = data.dense_retrieval && data.dense_loaded ? `ready/${data.dense_device || "?"}` : "off";
+    const adapterState = data.top_n_adapters ? ` · adapters=${data.top_n_adapters}` : "";
+    statusEl.textContent = `retrieval=${retrieval} · generation=${generation} · top_k=${data.top_k} · dense=${denseState}${adapterState}`;
   } catch {
     statusEl.textContent = "Không lấy được trạng thái backend";
   }
@@ -45,7 +63,7 @@ form.addEventListener("submit", async (event) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ question, history: chatHistory.slice(-maxHistoryItems) }),
     });
-    const data = await response.json();
+    const data = await parseJsonResponse(response);
     if (!response.ok) {
       throw new Error(data.detail || "Request failed");
     }
